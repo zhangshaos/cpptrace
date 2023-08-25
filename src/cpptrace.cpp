@@ -101,3 +101,56 @@ namespace cpptrace {
         }
     }
 }
+
+
+#include <string>
+#include <sstream>
+
+
+std::string
+str_trace(const std::string &prefix_msg, std::uint32_t skip){
+  using namespace cpptrace;
+  std::ostringstream oss;
+  oss << prefix_msg << '\n';
+  enable_virtual_terminal_processing_if_needed();
+  std::size_t counter = 0;
+  const auto trace = generate_trace(skip + 1);
+  if(trace.empty()) {
+    oss<<"<empty trace>"<<std::endl;
+    return oss.str();
+  }
+  const auto frame_number_width = n_digits(static_cast<int>(trace.size()) - 1);
+  for(const auto& frame : trace) {
+    oss
+    << '#'
+    << std::setw(static_cast<int>(frame_number_width))
+    << std::left
+    << counter++
+    << std::right
+    << " "
+    << std::hex
+    << BLUE
+    << "0x"
+    << std::setw(2 * sizeof(uintptr_t))
+    << std::setfill('0')
+    << frame.address
+    << std::dec
+    << std::setfill(' ')
+    << RESET
+    << " in "
+    << YELLOW
+    << frame.symbol
+    << RESET
+    << " at "
+    << GREEN
+    << frame.filename
+    << RESET
+    << ":"
+    << BLUE
+    << frame.line
+    << RESET
+    << (frame.col > 0 ? ":" BLUE + std::to_string(frame.col) + RESET : "")
+    << std::endl;
+  }
+  return oss.str();
+}

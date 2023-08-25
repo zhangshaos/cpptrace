@@ -17,4 +17,7 @@ namespace cpptrace {
     void print_trace(std::uint32_t skip = 0);
 }
 
+std::string
+str_trace(const std::string &prefix_msg, std::uint32_t skip = 0);
+
 #endif
